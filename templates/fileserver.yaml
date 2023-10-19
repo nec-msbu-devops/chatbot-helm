@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.fileserver.name }}
+  name: {{ .Values.fileserver.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.fileserver.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.fileserver.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.fileserver.name }}
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: fileserver-secret
+        image: {{ .Values.global.aws_account_id }}.dkr.ecr.ap-southeast-1.amazonaws.com/{{ .Values.fileserver.image }}:{{ .Values.fileserver.image_tag }}
+        name: {{ .Values.fileserver.name }}
+        volumeMounts:
+        - mountPath: /home/node/app/static
+          name: filestoragevol
+      restartPolicy: Always
+      volumes:
+      - name: filestoragevol
+        persistentVolumeClaim:
+          claimName: efs-claim
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.fileserver.name }}
+  name: {{ .Values.fileserver.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - port: {{ .Values.fileserver.port }}
+    targetPort: {{ .Values.fileserver.targetPort }}
+  selector:
+    app: {{ .Values.fileserver.name }}
+              
+
+

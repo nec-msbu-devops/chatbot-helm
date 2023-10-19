@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.socketserver.name }}
+  name: {{ .Values.socketserver.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.socketserver.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.socketserver.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.socketserver.name }}
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: socketserver-secret
+        image: {{ .Values.global.aws_account_id }}.dkr.ecr.ap-southeast-1.amazonaws.com/{{ .Values.socketserver.image }}:{{ .Values.socketserver.image_tag }}
+        name: {{ .Values.socketserver.name }}
+        volumeMounts:
+        - mountPath: /home/node/app/volume/socket
+          subPath: socket
+          name: socketserver-pv
+      restartPolicy: Always
+      volumes:
+      - name: socketserver-pv
+        persistentVolumeClaim:
+          claimName: efs-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.socketserver.name }}
+  name: {{ .Values.socketserver.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - port: {{ .Values.socketserver.port }}
+    targetPort: {{ .Values.socketserver.targetPort }}
+  selector:
+    app: {{ .Values.socketserver.name }}
+              
+
+
+---
+
+apiVersion: v1
+data:
+  MAMONGO_HOST: {{ .Values.database.database_url }}
+  MASQL_HOST: {{ .Values.database.database_url }}
+  MYSQL_DATABASE: {{ .Values.database.database_name }}
+  MYSQL_PASSWORD: {{ .Values.database.database_pass }}
+  MYSQL_USER: {{ .Values.database.database_user }}
+  NODE_ENV: {{ .Values.global.namespace }}
+  jwtSecret: {{ .Values.env.jwtSecret }}
+kind: Secret
+metadata:
+  name: socketserver-secret
+

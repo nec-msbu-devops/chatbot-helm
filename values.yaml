@@ -1,0 +1,125 @@
+chatbotapi:
+  #deployment
+  replicas: 1
+  image: chatbotapi
+  image_tag: v1.0.0
+  name: chatbotapi
+  containerPort: 80
+
+  #service
+  port: 80
+  targetPort: 80
+
+
+livechatapi:
+  #deployment
+  replicas: 1
+  image: livechatapi
+  image_tag: v1.0.0
+  name: livechatapi
+
+  #service
+  port: 55555
+  targetPort: 0
+
+userapi:
+  #deployment
+  replicas: 1
+  image: userapi
+  image_tag: v1.0.0
+  name: userapi
+
+  #service
+  port: 55555
+  targetPort: 0
+
+
+fileserver:
+  #deployment
+  replicas: 1
+  image: fileserver
+  image_tag: v1.0.0
+  name: fileserver
+
+  #service
+  port: 55555
+  targetPort: 0
+
+coreengine:
+  #deployment
+  replicas: 1
+  image: coreengine
+  image_tag: v1.0.0
+  name: coreengine
+
+  #service
+  port: 55555
+  targetPort: 0
+
+
+socketserver:
+  #deployment
+  replicas: 1
+  image: socketserver
+  image_tag: v1.0.0
+  name: socketserver
+
+  #service
+  port: 55555
+  targetPort: 0
+
+
+videoserver:
+  #deployment
+  replicas: 1
+  image: videoserver
+  image_tag: v1.0.0
+  name: videoserver
+
+  #service
+  port: 55555
+  targetPort: 0
+
+
+adminui:
+  #deployment
+  replicas: 1
+  image: adminui
+  image_tag: v1.0.0
+  name: adminui
+  containerPort: 3000
+
+  #service
+  port: 80
+  targetPort: 3000
+
+
+chatboxui:
+  #deployment
+  replicas: 1
+  image: chatboxui
+  image_tag: v1.0.0
+  name: chatboxui
+  containerPort: 3000
+
+  #service
+  port: 80
+  targetPort: 3000
+
+
+database:
+  database_url: development-1.c8qhkqsk6pgj.ap-southeast-1.rds.amazonaws.com
+  database_name: NECAIDB
+  database_user: admin
+  database_pass: NECAIDBuser20171020
+
+env:
+  jwtSecret: soseCREToMg8228
+  port: 80
+
+
+global:
+  namespace: test-helm
+  aws_account_id: null
+  
+

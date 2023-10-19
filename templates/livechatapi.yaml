@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.livechatapi.name }}
+  name: {{ .Values.livechatapi.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.livechatapi.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.livechatapi.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.livechatapi.name }}
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: livechatapi-secret
+        image: "{{ .Values.global.aws_account_id }}.dkr.ecr.ap-southeast-1.amazonaws.com/{{ .Values.chatbotapi.image }}:{{ .Values.chatbotapi.image_tag }}"
+        name: {{ .Values.livechatapi.name }}
+        volumeMounts:
+        - mountPath: /home/node/app/volume/livechat
+          subPath: chatbot
+          name: livechatapi-pv
+      restartPolicy: Always
+      volumes:
+      - name: livechatapi-pv
+        persistentVolumeClaim:
+          claimName: efs-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.livechatapi.name }}
+  name: {{ .Values.livechatapi.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.livechatapi.port }}
+    targetPort: {{ .Values.livechatapi.targetPort }}
+  selector:
+    app: {{ .Values.livechatapi.name }}
+              
+
+---
+
+apiVersion: v1
+data:
+  MAMONGO_HOST: {{ .Values.database.database_url }}
+  MASQL_HOST: {{ .Values.database.database_url }}
+  MYSQL_DATABASE: {{ .Values.database.database_name }}
+  MYSQL_PASSWORD: {{ .Values.database.database_pass }}
+  MYSQL_USER: {{ .Values.database.database_user }}
+  NODE_ENV: {{ .Values.global.namespace }}
+  jwtSecret: {{ .Values.env.jwtSecret }}
+kind: Secret
+metadata:
+  name: livechatapi-secret
