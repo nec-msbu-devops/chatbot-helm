@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.videoserver.name }}
+  name: {{ .Values.videoserver.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.videoserver.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.videoserver.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.videoserver.name }}
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: videoserver-secret
+        image: {{ .Values.global.aws_account_id }}.dkr.ecr.ap-southeast-1.amazonaws.com/{{ .Values.videoserver.image }}:{{ .Values.videoserver.image_tag }}
+        name: {{ .Values.videoserver.name }}
+        volumeMounts:
+        - mountPath: /home/node/app/volume/video
+          subPath: video
+          name: videoserver-pv
+      restartPolicy: Always
+      volumes:
+      - name: videoserver-pv
+        persistentVolumeClaim:
+          claimName: efs-claim 
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.videoserver.name }}
+  name: {{ .Values.videoserver.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - port: {{ .Values.videoserver.port }}
+    targetPort: {{ .Values.videoserver.targetPort }}
+  selector:
+    app: {{ .Values.videoserver.name }}
+              
+
+
+---
+
+apiVersion: v1
+data:
+  NODE_ENV: {{ .Values.global.namespace }}
+  jwtSecret: {{ .Values.env.jwtSecret }}
+kind: Secret
+metadata:
+  name: videoserver-secret
+

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.adminui.name }}
+  name: {{ .Values.adminui.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.adminui.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.adminui.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.adminui.name }}
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: adminui-secret
+        image: {{ .Values.global.aws_account_id }}.dkr.ecr.ap-southeast-1.amazonaws.com/{{ .Values.adminui.image }}:{{ .Values.adminui.image_tag }}
+        name: {{ .Values.adminui.name }}
+        ports:
+        - containerPort: {{ .Values.adminui.containerPort }}
+      restartPolicy: Always
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.adminui.name }}
+  name: {{ .Values.adminui.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - port: {{ .Values.adminui.port }}
+    targetPort: {{ .Values.adminui.targetPort }}
+  selector:
+    app: {{ .Values.adminui.name }}
+              
+
+
+---
+
+apiVersion: v1
+data:
+  MAMONGO_HOST: {{ .Values.database.database_url }}
+  MASQL_HOST: {{ .Values.database.database_url }}
+  MYSQL_DATABASE: {{ .Values.database.database_name }}
+  MYSQL_PASSWORD: {{ .Values.database.database_pass }}
+  MYSQL_USER: {{ .Values.database.database_user }}
+  NODE_ENV: {{ .Values.global.namespace }}
+  jwtSecret: {{ .Values.env.jwtSecret }}
+kind: Secret
+metadata:
+  name: adminui-secret
+

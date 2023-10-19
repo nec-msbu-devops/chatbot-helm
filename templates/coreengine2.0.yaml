@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.coreengine.name }}
+  name: {{ .Values.coreengine.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.coreengine.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.coreengine.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.coreengine.name }}
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: coreengine-secret
+        image: "{{ .Values.global.aws_account_id }}.dkr.ecr.ap-southeast-1.amazonaws.com/{{ .Values.chatbotapi.image }}:{{ .Values.chatbotapi.image_tag }}"
+        name: {{ .Values.coreengine.name }}
+        volumeMounts:
+        - mountPath: /usr/data/models
+          subPath: chatbot
+          name: coreengine-pv
+      restartPolicy: Always
+      volumes:
+      - name: coreengine-pv
+        persistentVolumeClaim:
+          claimName: efs-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.coreengine.name }}
+  name: {{ .Values.coreengine.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.coreengine.port }}
+    targetPort: {{ .Values.coreengine.targetPort }}
+  selector:
+    app: {{ .Values.coreengine.name }}
+
+
+---
+
+apiVersion: v1
+data:
+  MAMONGO_HOST: {{ .Values.database.database_url }}
+  MASQL_HOST: {{ .Values.database.database_url }}
+  MYSQL_DATABASE: {{ .Values.database.database_name }}
+  MYSQL_PASSWORD: {{ .Values.database.database_pass }}
+  MYSQL_USER: {{ .Values.database.database_user }}
+kind: Secret
+metadata:
+  name: coreengine-secret
+              
+
+
+
+
