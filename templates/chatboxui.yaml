@@ -56,7 +56,7 @@ data:
   MYSQL_DATABASE: {{ .Values.database.database_name }}
   MYSQL_PASSWORD: {{ .Values.database.database_pass }}
   MYSQL_USER: {{ .Values.database.database_user }}
-  NODE_ENV: {{ .Values.global.namespace }}
+  NODE_ENV: {{ .Values.env.namespace }}
   jwtSecret: {{ .Values.env.jwtSecret }}
 kind: Secret
 metadata:

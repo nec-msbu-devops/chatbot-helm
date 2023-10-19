@@ -108,14 +108,14 @@ chatboxui:
 
 
 database:
-  database_url: development-1.c8qhkqsk6pgj.ap-southeast-1.rds.amazonaws.com
-  database_name: NECAIDB
-  database_user: admin
-  database_pass: NECAIDBuser20171020
-
+  database_url: ZGV2ZWxvcG1lbnQtMS5jOHFoa3FzazZwZ2ouYXAtc291dGhlYXN0LTEucmRzLmFtYXpvbmF3cy5jb20=
+  database_name: TkVDQUlEQg==
+  database_user: YWRtaW4=
+  database_pass: TkVDQUlEQnVzZXIyMDE3MTAyMA==
 env:
-  jwtSecret: soseCREToMg8228
-  port: 80
+  jwtSecret: c29zZUNSRVRvTWc4MjI4
+  port: ODA=
+  namespace: ZGV2ZWxvcG1lbnQ=
 
 
 global:

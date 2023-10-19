@@ -56,7 +56,7 @@ spec:
 
 apiVersion: v1
 data:
-  NODE_ENV: {{ .Values.global.namespace }}
+  NODE_ENV: {{ .Values.env.namespace }}
   jwtSecret: {{ .Values.env.jwtSecret }}
 kind: Secret
 metadata:
