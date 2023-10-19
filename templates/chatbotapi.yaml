@@ -55,6 +55,7 @@ spec:
 ---
 
 apiVersion: v1
+type: Opaque
 data:
   MAMONGO_HOST: {{ .Values.database.database_url }}
   MASQL_HOST: {{ .Values.database.database_url }}

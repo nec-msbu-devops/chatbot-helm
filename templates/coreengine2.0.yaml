@@ -63,7 +63,7 @@ data:
 kind: Secret
 metadata:
   name: coreengine-secret
-              
+type: Opaque              
 
 
 

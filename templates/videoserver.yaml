@@ -61,4 +61,4 @@ data:
 kind: Secret
 metadata:
   name: videoserver-secret
-
+type: Opaque

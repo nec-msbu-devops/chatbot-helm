@@ -63,5 +63,6 @@ data:
   NODE_ENV: {{ .Values.global.namespace }}
   jwtSecret: {{ .Values.env.jwtSecret }}
 kind: Secret
+type: Opaque
 metadata:
   name: livechatapi-secret
